@@ -117,6 +117,31 @@ describe('CLI help output', () => {
     });
   });
 
+  it('accepts --coverage.reporters and populates options.coverage.reporters', () => {
+    const parsed = createCli().parse(
+      ['node', 'rstest', 'run', '--coverage.reporters', 'clover'],
+      { run: false },
+    );
+
+    expect(parsed.options.coverage.reporters).toBe('clover');
+  });
+
+  it('accepts legacy --coverage.reporter as an alias for --coverage.reporters', () => {
+    const parsed = createCli().parse(
+      [
+        'node',
+        'rstest',
+        'run',
+        '--coverage.reporter',
+        'clover',
+        '--coverage.reporter=json',
+      ],
+      { run: false },
+    );
+
+    expect(parsed.options.coverage.reporters).toEqual(['clover', 'json']);
+  });
+
   it('allows --coverage=false to be mixed with nested coverage options', () => {
     const parsed = createCli().parse(
       ['node', 'rstest', 'run', '--coverage=false', '--coverage.changed=HEAD'],

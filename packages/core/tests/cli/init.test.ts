@@ -546,6 +546,83 @@ describe('resolveProjects', () => {
         provider: 'v8',
       });
     });
+
+    it('should override config coverage.reporters with CLI --coverage.reporters', async () => {
+      const projects = await resolveProjects({
+        config: {
+          projects: [
+            {
+              name: 'test-project',
+              coverage: {
+                enabled: true,
+                reporters: ['text'],
+              },
+            },
+          ],
+        },
+        root: rootPath,
+        options: {
+          coverage: {
+            reporters: 'clover',
+          },
+        },
+      });
+
+      expect(projects[0]!.config.coverage).toMatchObject({
+        enabled: true,
+        reporters: ['clover'],
+      });
+    });
+
+    it('should accept multiple --coverage.reporters values as an array', async () => {
+      const projects = await resolveProjects({
+        config: {
+          projects: [
+            {
+              name: 'test-project',
+              coverage: {
+                enabled: true,
+                reporters: ['text'],
+              },
+            },
+          ],
+        },
+        root: rootPath,
+        options: {
+          coverage: {
+            reporters: ['clover', 'json'],
+          },
+        },
+      });
+
+      expect(projects[0]!.config.coverage).toMatchObject({
+        enabled: true,
+        reporters: ['clover', 'json'],
+      });
+    });
+
+    it('should enable coverage when coverage.reporters is set from CLI', async () => {
+      const projects = await resolveProjects({
+        config: {
+          projects: [
+            {
+              name: 'test-project',
+            },
+          ],
+        },
+        root: rootPath,
+        options: {
+          coverage: {
+            reporters: 'clover',
+          },
+        },
+      });
+
+      expect(projects[0]!.config.coverage).toMatchObject({
+        enabled: true,
+        reporters: ['clover'],
+      });
+    });
   });
 
   describe('pool CLI options', () => {
